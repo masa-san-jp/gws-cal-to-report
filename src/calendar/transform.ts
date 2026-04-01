@@ -23,7 +23,6 @@ function extractEventDetail(event: CalendarEvent): EventDetail {
 
   const attendees = (event.attendees ?? [])
     .map(a => a.displayName ?? a.email)
-    .filter(name => name !== undefined)
 
   return {
     id: event.id,

@@ -172,7 +172,7 @@ export async function generateReport(options: GenerateOptions): Promise<Report> 
   const prompt = buildPrompt(options)
 
   const content = await generateWithClaude(prompt, {
-    maxTokens: 2000,
+    maxTokens: options.reportType === 'weekly' ? 4000 : 2000,
     temperature: 0.3
   })
 

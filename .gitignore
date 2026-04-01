@@ -4,4 +4,3 @@ output/
 .env
 .env.*
 *.log
-log/

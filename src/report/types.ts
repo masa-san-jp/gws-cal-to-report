@@ -7,9 +7,22 @@ export interface WeeklySummary {
   uniqueAttendees: number
 }
 
+export interface EventDetail {
+  id: string
+  title: string
+  startTime: string
+  endTime: string
+  durationMinutes: number
+  attendees: string[]
+  description?: string
+  location?: string
+  isRecurring: boolean
+}
+
 export interface DailyEvents {
   date: string
   events: CalendarEvent[]
+  eventDetails: EventDetail[]
   totalMinutes: number
 }
 
@@ -33,4 +46,4 @@ export interface Report {
   content: string
 }
 
-export type ReportType = 'summary' | 'detailed' | 'business'
+export type ReportType = 'summary' | 'detailed' | 'business' | 'weekly'

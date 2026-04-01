@@ -1,6 +1,6 @@
 import { format, differenceInMinutes, parseISO } from 'date-fns'
 import type { CalendarEvent } from './types.js'
-import type { TransformResult, DailyEvents, AttendeeStats, WeeklySummary } from '../report/types.js'
+import type { TransformResult, DailyEvents, AttendeeStats, WeeklySummary, EventDetail } from '../report/types.js'
 
 function getEventDateTime(event: CalendarEvent): { start: Date; end: Date } {
   const startStr = 'dateTime' in event.start ? event.start.dateTime : event.start.date
@@ -15,6 +15,27 @@ function getEventDateTime(event: CalendarEvent): { start: Date; end: Date } {
 function calculateDuration(event: CalendarEvent): number {
   const { start, end } = getEventDateTime(event)
   return differenceInMinutes(end, start)
+}
+
+function extractEventDetail(event: CalendarEvent): EventDetail {
+  const { start, end } = getEventDateTime(event)
+  const durationMinutes = differenceInMinutes(end, start)
+
+  const attendees = (event.attendees ?? [])
+    .map(a => a.displayName ?? a.email)
+    .filter(name => name !== undefined)
+
+  return {
+    id: event.id,
+    title: event.summary ?? '(無題)',
+    startTime: format(start, 'HH:mm'),
+    endTime: format(end, 'HH:mm'),
+    durationMinutes,
+    attendees,
+    description: event.description,
+    location: event.location,
+    isRecurring: (event.recurrence ?? []).length > 0
+  }
 }
 
 function groupByDate(events: CalendarEvent[]): Map<string, CalendarEvent[]> {
@@ -64,6 +85,7 @@ export function transformEvents(events: CalendarEvent[]): TransformResult {
     .map(([date, dayEvents]) => ({
       date,
       events: dayEvents,
+      eventDetails: dayEvents.map(extractEventDetail),
       totalMinutes: dayEvents.reduce((sum, e) => sum + calculateDuration(e), 0)
     }))
     .sort((a, b) => a.date.localeCompare(b.date))
